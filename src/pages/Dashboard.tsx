@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, Typography, Paper } from '@mui/material';
+import { Box, Typography, Paper, Chip } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 
 function Dashboard() {
-  const { currentEmail } = useAuth();
+  const { currentEmail, permissions, can } = useAuth();
 
   return (
     <Box
@@ -39,10 +39,48 @@ function Dashboard() {
         <Typography 
           variant="h6" 
           color="text.secondary"
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, mb: 3 }}
         >
           Logged in as: {currentEmail}
         </Typography>
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Your Permissions:
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+            {permissions.length > 0 ? (
+              permissions.map((permission) => (
+                <Chip
+                  key={permission}
+                  label={permission}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No permissions assigned
+              </Typography>
+            )}
+          </Box>
+        </Box>
+
+        <Box>
+          <Typography variant="body2" color="text.secondary">
+            Quick Permission Tests:
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Can see users: {can('see_users') ? '✅' : '❌'}
+          </Typography>
+          <Typography variant="body2">
+            Can manage finance: {can('manage_finance') ? '✅' : '❌'}
+          </Typography>
+          <Typography variant="body2">
+            Can see classes: {can('see_classes') ? '✅' : '❌'}
+          </Typography>
+        </Box>
       </Paper>
     </Box>
   );

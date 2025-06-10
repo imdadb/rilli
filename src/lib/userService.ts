@@ -7,6 +7,14 @@ export interface User {
   email_verified: boolean;
 }
 
+export interface UserWithPermissions {
+  id: string;
+  email: string;
+  password: string | null;
+  email_verified: boolean;
+  permissions: string[];
+}
+
 export async function fetchUserByEmail(email: string): Promise<User | null> {
   const { data, error } = await supabase
     .from('users')
@@ -20,6 +28,49 @@ export async function fetchUserByEmail(email: string): Promise<User | null> {
   }
   
   return data;
+}
+
+export async function fetchUserWithPermissions(email: string): Promise<UserWithPermissions | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select(`
+      id,
+      email,
+      password,
+      email_verified,
+      roles: role_user (
+        role: roles (
+          name,
+          permissions: permission_role (
+            permission: permissions ( name )
+          )
+        )
+      )
+    `)
+    .eq('email', email)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching user with permissions:', error);
+    throw error;
+  }
+  
+  if (!data) return null;
+
+  // Flatten permission names into an array
+  const perms: string[] = [];
+  data.roles?.forEach((r: any) => {
+    r.role?.permissions?.forEach((p: any) => {
+      if (p.permission?.name) {
+        perms.push(p.permission.name);
+      }
+    });
+  });
+
+  return { 
+    ...data, 
+    permissions: Array.from(new Set(perms)) // Remove duplicates
+  };
 }
 
 export async function validatePassword(email: string, rawPassword: string): Promise<boolean> {

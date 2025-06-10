@@ -10,7 +10,7 @@ import {
   Container,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
-import { fetchUserByEmail, validatePassword, createVerificationToken } from '../lib/userService';
+import { fetchUserWithPermissions, validatePassword, createVerificationToken } from '../lib/userService';
 import { sendVerificationEmail } from '../lib/sendEmail';
 
 interface EmailCheckResult {
@@ -21,7 +21,7 @@ interface EmailCheckResult {
 // Check if email is registered in Supabase
 const checkEmailRegistered = async (email: string): Promise<EmailCheckResult> => {
   try {
-    const user = await fetchUserByEmail(email);
+    const user = await fetchUserWithPermissions(email);
     
     if (!user) {
       return { registered: false, firstTime: false };
@@ -124,8 +124,17 @@ function Login() {
       const isValid = await validatePassword(email, password);
       
       if (isValid) {
-        login(email);
-        navigate('/dashboard');
+        // Fetch user with permissions
+        const userWithPermissions = await fetchUserWithPermissions(email);
+        if (userWithPermissions) {
+          login(email, userWithPermissions.permissions);
+          navigate('/dashboard');
+        } else {
+          setAlert({
+            type: 'error',
+            message: 'Failed to load user data. Please try again.'
+          });
+        }
       } else {
         setAlert({
           type: 'error',

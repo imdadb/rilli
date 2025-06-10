@@ -4,8 +4,10 @@ interface AuthContextType {
   isLoggedIn: boolean;
   currentEmail: string | null;
   expiresAt: number | null;
-  login: (email: string) => void;
+  permissions: string[];
+  login: (email: string, permissions: string[]) => void;
   logout: () => void;
+  can: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,22 +20,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
+
+  // Helper function to check permissions
+  const can = (permission: string): boolean => {
+    return permissions.includes(permission);
+  };
 
   // Load auth state from localStorage on mount
   useEffect(() => {
     const savedAuth = localStorage.getItem('auth');
     const savedExpiresAt = localStorage.getItem('expiresAt');
+    const savedPermissions = localStorage.getItem('permissions');
     
     if (savedAuth && savedExpiresAt) {
       try {
         const { isLoggedIn: savedIsLoggedIn, currentEmail: savedEmail } = JSON.parse(savedAuth);
         const expiryTime = Number(savedExpiresAt);
+        const userPermissions = savedPermissions ? JSON.parse(savedPermissions) : [];
         
         // Check if session is still valid
         if (savedIsLoggedIn && savedEmail && Date.now() < expiryTime) {
           setIsLoggedIn(true);
           setCurrentEmail(savedEmail);
           setExpiresAt(expiryTime);
+          setPermissions(userPermissions);
         } else {
           // Session expired, clean up
           logout();
@@ -80,29 +91,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [isLoggedIn]);
 
-  const login = (email: string) => {
+  const login = (email: string, userPermissions: string[] = []) => {
     const timeoutMin = Number(import.meta.env.VITE_SESSION_TIMEOUT_MIN) || 30;
     const newExpiry = Date.now() + timeoutMin * 60_000;
     
     setIsLoggedIn(true);
     setCurrentEmail(email);
     setExpiresAt(newExpiry);
+    setPermissions(userPermissions);
     
     localStorage.setItem('auth', JSON.stringify({ isLoggedIn: true, currentEmail: email }));
     localStorage.setItem('expiresAt', String(newExpiry));
+    localStorage.setItem('permissions', JSON.stringify(userPermissions));
   };
 
   const logout = () => {
     setIsLoggedIn(false);
     setCurrentEmail(null);
     setExpiresAt(null);
+    setPermissions([]);
     
     localStorage.removeItem('auth');
     localStorage.removeItem('expiresAt');
+    localStorage.removeItem('permissions');
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, currentEmail, expiresAt, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isLoggedIn, 
+      currentEmail, 
+      expiresAt, 
+      permissions, 
+      login, 
+      logout, 
+      can 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -10,6 +10,7 @@ import About from './components/About';
 import Login from './pages/Login';
 import Verify from './pages/Verify';
 import Dashboard from './pages/Dashboard';
+import DebugPermissions from './pages/DebugPermissions';
 
 const theme = createTheme({
   palette: {
@@ -37,10 +38,11 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<Verify />} />
+          <Route path="/debug-perms" element={<DebugPermissions />} />
           <Route path="/*" element={
             <MainLayout>
               <Routes>
-                <Route path="/\" element={<Home />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
