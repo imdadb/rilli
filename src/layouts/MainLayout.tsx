@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -21,10 +21,10 @@ import {
   Home as HomeIcon,
   Info as InfoIcon,
   Login as LoginIcon,
-  Dashboard as DashboardIcon,
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { menuConfig } from '../config/menuConfig';
 
 const drawerWidth = 240;
 
@@ -37,7 +37,7 @@ function MainLayout({ children }: MainLayoutProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, can } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -63,10 +63,13 @@ function MainLayout({ children }: MainLayoutProps) {
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
+  // Filter menu items based on permissions
+  const filteredMenuItems = menuConfig.filter(item => 
+    item.permission === '*' || can(item.permission)
+  );
+
   const authMenuItems = isLoggedIn 
-    ? [
-        { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-      ]
+    ? []
     : [
         { text: 'Login', icon: <LoginIcon />, path: '/login' },
       ];
@@ -74,6 +77,8 @@ function MainLayout({ children }: MainLayoutProps) {
   const drawer = (
     <div>
       <Toolbar />
+      
+      {/* Public menu items */}
       <List>
         {publicMenuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
@@ -87,25 +92,55 @@ function MainLayout({ children }: MainLayoutProps) {
       
       <Divider />
       
-      <List>
-        {authMenuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => handleNavigation(item.path)}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-        
-        {isLoggedIn && (
-          <ListItem disablePadding>
-            <ListItemButton onClick={handleLogout}>
-              <ListItemIcon><LogoutIcon /></ListItemIcon>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </ListItem>
-        )}
-      </List>
+      {/* Permission-based menu items (only show if logged in) */}
+      {isLoggedIn && (
+        <List>
+          {filteredMenuItems.map((item) => (
+            <ListItem key={item.path} disablePadding>
+              <ListItemButton 
+                component={Link} 
+                to={item.path}
+                onClick={() => isMobile && setMobileOpen(false)}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
+      
+      {/* Auth menu items */}
+      {authMenuItems.length > 0 && (
+        <>
+          <Divider />
+          <List>
+            {authMenuItems.map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton onClick={() => handleNavigation(item.path)}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </>
+      )}
+      
+      {/* Logout button */}
+      {isLoggedIn && (
+        <>
+          <Divider />
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleLogout}>
+                <ListItemIcon><LogoutIcon /></ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </>
+      )}
     </div>
   );
 
