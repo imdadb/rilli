@@ -17,44 +17,86 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentEmail, setCurrentEmail] = useState<string | null>(null);
-  const [expiresAt, setExpiresAt] = useState<number | null>(null);
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    try {
+      const savedAuth = localStorage.getItem('auth');
+      const savedExpiresAt = localStorage.getItem('expiresAt');
+      
+      if (savedAuth && savedExpiresAt) {
+        const { isLoggedIn: savedIsLoggedIn } = JSON.parse(savedAuth);
+        const expiryTime = Number(savedExpiresAt);
+        
+        // Check if session is still valid
+        return savedIsLoggedIn && Date.now() < expiryTime;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error loading auth state:', error);
+      return false;
+    }
+  });
+
+  const [currentEmail, setCurrentEmail] = useState<string | null>(() => {
+    try {
+      const savedAuth = localStorage.getItem('auth');
+      const savedExpiresAt = localStorage.getItem('expiresAt');
+      
+      if (savedAuth && savedExpiresAt) {
+        const { currentEmail: savedEmail } = JSON.parse(savedAuth);
+        const expiryTime = Number(savedExpiresAt);
+        
+        // Check if session is still valid
+        if (Date.now() < expiryTime) {
+          return savedEmail;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error loading current email:', error);
+      return null;
+    }
+  });
+
+  const [expiresAt, setExpiresAt] = useState<number | null>(() => {
+    try {
+      const savedExpiresAt = localStorage.getItem('expiresAt');
+      if (savedExpiresAt) {
+        const expiryTime = Number(savedExpiresAt);
+        // Check if session is still valid
+        if (Date.now() < expiryTime) {
+          return expiryTime;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error loading expiry time:', error);
+      return null;
+    }
+  });
+
+  const [permissions, setPermissions] = useState<string[]>(() => {
+    try {
+      const savedPermissions = localStorage.getItem('permissions');
+      const savedExpiresAt = localStorage.getItem('expiresAt');
+      
+      if (savedPermissions && savedExpiresAt) {
+        const expiryTime = Number(savedExpiresAt);
+        // Check if session is still valid
+        if (Date.now() < expiryTime) {
+          return JSON.parse(savedPermissions);
+        }
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading permissions:', error);
+      return [];
+    }
+  });
 
   // Helper function to check permissions
   const can = (permission: string): boolean => {
     return permissions.includes(permission);
   };
-
-  // Load auth state from localStorage on mount
-  useEffect(() => {
-    const savedAuth = localStorage.getItem('auth');
-    const savedExpiresAt = localStorage.getItem('expiresAt');
-    const savedPermissions = localStorage.getItem('permissions');
-    
-    if (savedAuth && savedExpiresAt) {
-      try {
-        const { isLoggedIn: savedIsLoggedIn, currentEmail: savedEmail } = JSON.parse(savedAuth);
-        const expiryTime = Number(savedExpiresAt);
-        const userPermissions = savedPermissions ? JSON.parse(savedPermissions) : [];
-        
-        // Check if session is still valid
-        if (savedIsLoggedIn && savedEmail && Date.now() < expiryTime) {
-          setIsLoggedIn(true);
-          setCurrentEmail(savedEmail);
-          setExpiresAt(expiryTime);
-          setPermissions(userPermissions);
-        } else {
-          // Session expired, clean up
-          logout();
-        }
-      } catch (error) {
-        console.error('Error loading auth state:', error);
-        logout();
-      }
-    }
-  }, []);
 
   // Session timeout and activity monitoring
   useEffect(() => {
