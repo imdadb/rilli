@@ -1,7 +1,6 @@
 /*
   # Preserve Super Admin & Reset Other Users
 
-  1. Preserve super_admin user (f830afa5-dbac-4db0-9d93-dc67dfd1f9db)
   2. Reset other users with correct UUIDs
   3. Clean role assignments
   4. Rebuild permission and delegation matrices
