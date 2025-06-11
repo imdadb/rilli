@@ -52,7 +52,7 @@ function App() {
             <MainLayout>
               <Routes>
                 <Route path="/\" element={<Home />} />
-                <Route path="/about" element={<About />} />
+                <Route path="/about\" element={<About />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <Dashboard />
