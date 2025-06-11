@@ -12,8 +12,6 @@
 BEGIN;
 
 -- 1. Clear volatile link tables (but preserve super_admin role assignments)
-DELETE FROM role_user 
-WHERE user_id != 'f830afa5-dbac-4db0-9d93-dc67dfd1f9db';
 
 DELETE FROM permission_role;
 DELETE FROM role_grant_matrix;
