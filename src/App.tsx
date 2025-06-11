@@ -15,7 +15,6 @@ import DebugPermissions from './pages/DebugPermissions';
 import UsersPage from './pages/UsersPage';
 import FinancePage from './pages/FinancePage';
 import ClassesPage from './pages/ClassesPage';
-import RoleManager from './pages/RoleManager';
 
 const theme = createTheme({
   palette: {
@@ -52,7 +51,7 @@ function App() {
           <Route path="/*" element={
             <MainLayout>
               <Routes>
-                <Route path="/\" element={<Home />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
@@ -77,13 +76,6 @@ function App() {
                   <ProtectedRoute>
                     <RoleGuard perm="see_classes">
                       <ClassesPage />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                } />
-                <Route path="/role-manager" element={
-                  <ProtectedRoute>
-                    <RoleGuard perm="manage_roles">
-                      <RoleManager />
                     </RoleGuard>
                   </ProtectedRoute>
                 } />

@@ -22,9 +22,12 @@ import {
   Info as InfoIcon,
   Login as LoginIcon,
   Logout as LogoutIcon,
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
+  AccountBalance as FinanceIcon,
+  School as ClassesIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { menuConfig } from '../config/menuConfig';
 
 const drawerWidth = 240;
 
@@ -63,8 +66,16 @@ function MainLayout({ children }: MainLayoutProps) {
     { text: 'About', icon: <InfoIcon />, path: '/about' },
   ];
 
+  // Protected menu items based on permissions
+  const protectedMenuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', permission: '*' },
+    { text: 'Users', icon: <PeopleIcon />, path: '/users', permission: 'see_users' },
+    { text: 'Finance', icon: <FinanceIcon />, path: '/finance', permission: 'see_finance' },
+    { text: 'Classes', icon: <ClassesIcon />, path: '/classes', permission: 'see_classes' },
+  ];
+
   // Filter menu items based on permissions
-  const filteredMenuItems = menuConfig.filter(item => 
+  const filteredProtectedItems = protectedMenuItems.filter(item => 
     item.permission === '*' || can(item.permission)
   );
 
@@ -95,7 +106,7 @@ function MainLayout({ children }: MainLayoutProps) {
       {/* Permission-based menu items (only show if logged in) */}
       {isLoggedIn && (
         <List>
-          {filteredMenuItems.map((item) => (
+          {filteredProtectedItems.map((item) => (
             <ListItem key={item.path} disablePadding>
               <ListItemButton 
                 component={Link} 
@@ -103,7 +114,7 @@ function MainLayout({ children }: MainLayoutProps) {
                 onClick={() => isMobile && setMobileOpen(false)}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemText primary={item.text} />
               </ListItemButton>
             </ListItem>
           ))}
