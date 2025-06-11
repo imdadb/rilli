@@ -53,11 +53,14 @@ function App() {
               <Routes>
                 <Route path="/\" element={<Home />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } />
+                <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
                 <Route path="/users" element={
                   <ProtectedRoute>
                     <RoleGuard perm="see_users">
