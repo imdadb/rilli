@@ -27,5 +27,10 @@ export const menuConfig: MenuItem[] = [
     label: 'Classes', 
     path: '/classes', 
     permission: 'see_classes' 
+  },
+  { 
+    label: 'Role Manager', 
+    path: '/role-manager', 
+    permission: 'manage_roles' 
   }
 ];
