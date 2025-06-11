@@ -124,10 +124,10 @@ function Login() {
       const isValid = await validatePassword(email, password);
       
       if (isValid) {
-        // Fetch user with permissions
+        // Fetch user with permissions and roles
         const userWithPermissions = await fetchUserWithPermissions(email);
         if (userWithPermissions) {
-          login(email, userWithPermissions.permissions);
+          login(email, userWithPermissions.permissions, userWithPermissions.roles);
           navigate('/dashboard');
         } else {
           setAlert({
@@ -247,7 +247,7 @@ function Login() {
 
           <Box sx={{ mt: 3, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Test: superadmin / tfssteam@gmail.com (password: administan)
+              Test: imdadb@gmail.com / tfssteam@gmail.com (password: administan)
             </Typography>
             <Typography variant="body2" color="text.secondary">
               First-time: tfss.manage@gmail.com (will send verification)

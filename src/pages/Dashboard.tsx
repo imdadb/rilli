@@ -3,7 +3,7 @@ import { Box, Typography, Paper, Chip } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 
 function Dashboard() {
-  const { currentEmail, permissions, can } = useAuth();
+  const { currentEmail, permissions, roles, can, hasRole } = useAuth();
 
   return (
     <Box
@@ -46,6 +46,29 @@ function Dashboard() {
 
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" gutterBottom>
+            Your Roles:
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center', mb: 2 }}>
+            {roles.length > 0 ? (
+              roles.map((role) => (
+                <Chip
+                  key={role}
+                  label={role.replace('_', ' ').toUpperCase()}
+                  color="secondary"
+                  variant="filled"
+                  size="small"
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No roles assigned
+              </Typography>
+            )}
+          </Box>
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
             Your Permissions:
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
@@ -75,10 +98,19 @@ function Dashboard() {
             Can see users: {can('see_users') ? '✅' : '❌'}
           </Typography>
           <Typography variant="body2">
-            Can manage finance: {can('manage_finance') ? '✅' : '❌'}
+            Can manage roles: {can('manage_roles') ? '✅' : '❌'}
+          </Typography>
+          <Typography variant="body2">
+            Can see finance: {can('see_finance') ? '✅' : '❌'}
           </Typography>
           <Typography variant="body2">
             Can see classes: {can('see_classes') ? '✅' : '❌'}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Has Super Admin role: {hasRole('super_admin') ? '✅' : '❌'}
+          </Typography>
+          <Typography variant="body2">
+            Has CEO role: {hasRole('CEO') ? '✅' : '❌'}
           </Typography>
         </Box>
       </Paper>

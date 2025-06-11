@@ -13,6 +13,7 @@ export interface UserWithPermissions {
   password: string | null;
   email_verified: boolean;
   permissions: string[];
+  roles: string[];
 }
 
 export async function fetchUserByEmail(email: string): Promise<User | null> {
@@ -59,7 +60,12 @@ export async function fetchUserWithPermissions(email: string): Promise<UserWithP
 
   // Flatten permission names into an array
   const perms: string[] = [];
+  const roleNames: string[] = [];
+  
   data.roles?.forEach((r: any) => {
+    if (r.role?.name) {
+      roleNames.push(r.role.name);
+    }
     r.role?.permissions?.forEach((p: any) => {
       if (p.permission?.name) {
         perms.push(p.permission.name);
@@ -69,7 +75,8 @@ export async function fetchUserWithPermissions(email: string): Promise<UserWithP
 
   return { 
     ...data, 
-    permissions: Array.from(new Set(perms)) // Remove duplicates
+    permissions: Array.from(new Set(perms)), // Remove duplicates
+    roles: Array.from(new Set(roleNames)) // Remove duplicates
   };
 }
 

@@ -5,9 +5,11 @@ interface AuthContextType {
   currentEmail: string | null;
   expiresAt: number | null;
   permissions: string[];
-  login: (email: string, permissions: string[]) => void;
+  roles: string[];
+  login: (email: string, permissions: string[], roles: string[]) => void;
   logout: () => void;
   can: (permission: string) => boolean;
+  hasRole: (role: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -93,9 +95,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   });
 
+  const [roles, setRoles] = useState<string[]>(() => {
+    try {
+      const savedRoles = localStorage.getItem('roles');
+      const savedExpiresAt = localStorage.getItem('expiresAt');
+      
+      if (savedRoles && savedExpiresAt) {
+        const expiryTime = Number(savedExpiresAt);
+        // Check if session is still valid
+        if (Date.now() < expiryTime) {
+          return JSON.parse(savedRoles);
+        }
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading roles:', error);
+      return [];
+    }
+  });
+
   // Helper function to check permissions
   const can = (permission: string): boolean => {
     return permissions.includes(permission);
+  };
+
+  // Helper function to check roles
+  const hasRole = (role: string): boolean => {
+    return roles.includes(role);
   };
 
   // Session timeout and activity monitoring
@@ -133,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [isLoggedIn]);
 
-  const login = (email: string, userPermissions: string[] = []) => {
+  const login = (email: string, userPermissions: string[] = [], userRoles: string[] = []) => {
     const timeoutMin = Number(import.meta.env.VITE_SESSION_TIMEOUT_MIN) || 30;
     const newExpiry = Date.now() + timeoutMin * 60_000;
     
@@ -141,10 +167,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setCurrentEmail(email);
     setExpiresAt(newExpiry);
     setPermissions(userPermissions);
+    setRoles(userRoles);
     
     localStorage.setItem('auth', JSON.stringify({ isLoggedIn: true, currentEmail: email }));
     localStorage.setItem('expiresAt', String(newExpiry));
     localStorage.setItem('permissions', JSON.stringify(userPermissions));
+    localStorage.setItem('roles', JSON.stringify(userRoles));
   };
 
   const logout = () => {
@@ -152,10 +180,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setCurrentEmail(null);
     setExpiresAt(null);
     setPermissions([]);
+    setRoles([]);
     
     localStorage.removeItem('auth');
     localStorage.removeItem('expiresAt');
     localStorage.removeItem('permissions');
+    localStorage.removeItem('roles');
   };
 
   return (
@@ -164,9 +194,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       currentEmail, 
       expiresAt, 
       permissions, 
+      roles,
       login, 
       logout, 
-      can 
+      can,
+      hasRole
     }}>
       {children}
     </AuthContext.Provider>
