@@ -33,7 +33,6 @@ WHERE email = 'tfss.manage@gmail.com';
 -- Remove any old links that might still use outdated user_ids
 DELETE FROM role_user
 WHERE user_id NOT IN (
-    'f830afa5-dbac-4db0-9d93-dc67dfd1f9db',
     '67377243-f151-4822-b31f-2445c65247b0',
     'c5e766c3-5f97-4bea-821d-cc45c0ee8a62'
 )
