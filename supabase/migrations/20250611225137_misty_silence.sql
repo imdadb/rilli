@@ -17,12 +17,8 @@
 BEGIN;
 
 -- 1. Remove any role links that still point to the OLD Super-Admin ID
-DELETE FROM role_user
-WHERE user_id = 'f830afa5-dbac-4db0-9d93-dc67dfd1f9db';
 
 -- 2. Delete the OLD Super-Admin row itself
-DELETE FROM users
-WHERE id = 'f830afa5-dbac-4db0-9d93-dc67dfd1f9db';
 
 -- 3. Create a NEW Super-Admin row with a fresh UUID
 WITH new_admin AS (
