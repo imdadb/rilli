@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -23,11 +29,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const savedAuth = localStorage.getItem('auth');
       const savedExpiresAt = localStorage.getItem('expiresAt');
-      
+
       if (savedAuth && savedExpiresAt) {
         const { isLoggedIn: savedIsLoggedIn } = JSON.parse(savedAuth);
         const expiryTime = Number(savedExpiresAt);
-        
+
         // Check if session is still valid
         return savedIsLoggedIn && Date.now() < expiryTime;
       }
@@ -42,11 +48,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const savedAuth = localStorage.getItem('auth');
       const savedExpiresAt = localStorage.getItem('expiresAt');
-      
+
       if (savedAuth && savedExpiresAt) {
         const { currentEmail: savedEmail } = JSON.parse(savedAuth);
         const expiryTime = Number(savedExpiresAt);
-        
+
         // Check if session is still valid
         if (Date.now() < expiryTime) {
           return savedEmail;
@@ -80,7 +86,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const savedPermissions = localStorage.getItem('permissions');
       const savedExpiresAt = localStorage.getItem('expiresAt');
-      
+
       if (savedPermissions && savedExpiresAt) {
         const expiryTime = Number(savedExpiresAt);
         // Check if session is still valid
@@ -99,7 +105,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const savedRoles = localStorage.getItem('roles');
       const savedExpiresAt = localStorage.getItem('expiresAt');
-      
+
       if (savedRoles && savedExpiresAt) {
         const expiryTime = Number(savedExpiresAt);
         // Check if session is still valid
@@ -138,7 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Reset timer on user activity
     const activityEvents = ['mousemove', 'keydown', 'click', 'scroll'];
-    activityEvents.forEach(event => {
+    activityEvents.forEach((event) => {
       window.addEventListener(event, resetTimer);
     });
 
@@ -152,24 +158,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, 10_000);
 
     return () => {
-      activityEvents.forEach(event => {
+      activityEvents.forEach((event) => {
         window.removeEventListener(event, resetTimer);
       });
       clearInterval(checkInterval);
     };
   }, [isLoggedIn]);
 
-  const login = (email: string, userPermissions: string[] = [], userRoles: string[] = []) => {
+  const login = (
+    email: string,
+    userPermissions: string[] = [],
+    userRoles: string[] = [],
+  ) => {
     const timeoutMin = Number(import.meta.env.VITE_SESSION_TIMEOUT_MIN) || 30;
     const newExpiry = Date.now() + timeoutMin * 60_000;
-    
+
     setIsLoggedIn(true);
     setCurrentEmail(email);
     setExpiresAt(newExpiry);
     setPermissions(userPermissions);
     setRoles(userRoles);
-    
-    localStorage.setItem('auth', JSON.stringify({ isLoggedIn: true, currentEmail: email }));
+
+    localStorage.setItem(
+      'auth',
+      JSON.stringify({ isLoggedIn: true, currentEmail: email }),
+    );
     localStorage.setItem('expiresAt', String(newExpiry));
     localStorage.setItem('permissions', JSON.stringify(userPermissions));
     localStorage.setItem('roles', JSON.stringify(userRoles));
@@ -181,7 +194,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setExpiresAt(null);
     setPermissions([]);
     setRoles([]);
-    
+
     localStorage.removeItem('auth');
     localStorage.removeItem('expiresAt');
     localStorage.removeItem('permissions');
@@ -189,17 +202,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      isLoggedIn, 
-      currentEmail, 
-      expiresAt, 
-      permissions, 
-      roles,
-      login, 
-      logout, 
-      can,
-      hasRole
-    }}>
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        currentEmail,
+        expiresAt,
+        permissions,
+        roles,
+        login,
+        logout,
+        can,
+        hasRole,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

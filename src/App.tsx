@@ -48,12 +48,14 @@ function App() {
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/debug-perms" element={<DebugPermissions />} />
-          <Route path="/*" element={
-            <MainLayout>
-              <Routes>
-                <Route path="/\" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route
+          <Route
+            path="/*"
+            element={
+              <MainLayout>
+                <Routes>
+                  <Route path="/\" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route
                     path="/dashboard"
                     element={
                       <ProtectedRoute>
@@ -61,30 +63,40 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
-                <Route path="/users" element={
-                  <ProtectedRoute>
-                    <RoleGuard perm="see_users">
-                      <UsersPage />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                } />
-                <Route path="/finance" element={
-                  <ProtectedRoute>
-                    <RoleGuard perm="see_finance">
-                      <FinancePage />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                } />
-                <Route path="/classes" element={
-                  <ProtectedRoute>
-                    <RoleGuard perm="see_classes">
-                      <ClassesPage />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                } />
-              </Routes>
-            </MainLayout>
-          } />
+                  <Route
+                    path="/users"
+                    element={
+                      <ProtectedRoute>
+                        <RoleGuard perm="see_users">
+                          <UsersPage />
+                        </RoleGuard>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/finance"
+                    element={
+                      <ProtectedRoute>
+                        <RoleGuard perm="see_finance">
+                          <FinancePage />
+                        </RoleGuard>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/classes"
+                    element={
+                      <ProtectedRoute>
+                        <RoleGuard perm="see_classes">
+                          <ClassesPage />
+                        </RoleGuard>
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </MainLayout>
+            }
+          />
         </Routes>
       </AuthProvider>
     </ThemeProvider>

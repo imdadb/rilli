@@ -31,13 +31,13 @@ function Home() {
         p: 3,
       }}
     >
-      <Typography 
-        variant="h1" 
-        component="h1" 
-        sx={{ 
+      <Typography
+        variant="h1"
+        component="h1"
+        sx={{
           textAlign: 'center',
           color: 'primary.main',
-          fontSize: { xs: '2.5rem', md: '3.75rem' }
+          fontSize: { xs: '2.5rem', md: '3.75rem' },
         }}
       >
         It boots! 🚀

@@ -10,7 +10,11 @@ import {
   Container,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
-import { fetchUserWithPermissions, validatePassword, createVerificationToken } from '../lib/userService';
+import {
+  fetchUserWithPermissions,
+  validatePassword,
+  createVerificationToken,
+} from '../lib/userService';
 import { sendVerificationEmail } from '../lib/sendEmail';
 
 interface EmailCheckResult {
@@ -19,18 +23,20 @@ interface EmailCheckResult {
 }
 
 // Check if email is registered in Supabase
-const checkEmailRegistered = async (email: string): Promise<EmailCheckResult> => {
+const checkEmailRegistered = async (
+  email: string,
+): Promise<EmailCheckResult> => {
   try {
     const user = await fetchUserWithPermissions(email);
-    
+
     if (!user) {
       return { registered: false, firstTime: false };
     }
-    
+
     if (!user.email_verified) {
       return { registered: true, firstTime: true };
     }
-    
+
     return { registered: true, firstTime: false };
   } catch (error) {
     console.error('Error checking email registration:', error);
@@ -53,11 +59,11 @@ function Login() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email.trim()) {
       setAlert({
         type: 'error',
-        message: 'Please enter your email address.'
+        message: 'Please enter your email address.',
       });
       return;
     }
@@ -67,11 +73,12 @@ function Login() {
 
     try {
       const result = await checkEmailRegistered(email);
-      
+
       if (!result.registered) {
         setAlert({
           type: 'error',
-          message: 'This email is not registered. Only existing staff, students, or guardians can access the system. Please contact school administration.'
+          message:
+            'This email is not registered. Only existing staff, students, or guardians can access the system. Please contact school administration.',
         });
         setShowPassword(false);
       } else if (result.firstTime) {
@@ -81,13 +88,15 @@ function Login() {
           await sendVerificationEmail(email, token);
           setAlert({
             type: 'success',
-            message: "We've sent a verification link to your email. Please open it to set your password."
+            message:
+              "We've sent a verification link to your email. Please open it to set your password.",
           });
         } catch (emailError) {
           console.error('Error sending verification email:', emailError);
           setAlert({
             type: 'error',
-            message: 'Failed to send verification email. Please try again or contact support.'
+            message:
+              'Failed to send verification email. Please try again or contact support.',
           });
         }
         setShowPassword(false);
@@ -99,7 +108,8 @@ function Login() {
     } catch (error) {
       setAlert({
         type: 'error',
-        message: 'An error occurred while checking your email. Please try again.'
+        message:
+          'An error occurred while checking your email. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -108,11 +118,11 @@ function Login() {
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!password.trim()) {
       setAlert({
         type: 'error',
-        message: 'Please enter your password.'
+        message: 'Please enter your password.',
       });
       return;
     }
@@ -122,29 +132,34 @@ function Login() {
 
     try {
       const isValid = await validatePassword(email, password);
-      
+
       if (isValid) {
         // Fetch user with permissions and roles
         const userWithPermissions = await fetchUserWithPermissions(email);
         if (userWithPermissions) {
-          login(email, userWithPermissions.permissions, userWithPermissions.roles);
+          login(
+            email,
+            userWithPermissions.permissions,
+            userWithPermissions.roles,
+          );
           navigate('/dashboard');
         } else {
           setAlert({
             type: 'error',
-            message: 'Failed to load user data. Please try again.'
+            message: 'Failed to load user data. Please try again.',
           });
         }
       } else {
         setAlert({
           type: 'error',
-          message: 'Incorrect password, please try again.'
+          message: 'Incorrect password, please try again.',
         });
       }
     } catch (error) {
       setAlert({
         type: 'error',
-        message: 'An error occurred while validating your password. Please try again.'
+        message:
+          'An error occurred while validating your password. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -180,8 +195,8 @@ function Login() {
           </Box>
 
           {alert && (
-            <Alert 
-              severity={alert.type} 
+            <Alert
+              severity={alert.type}
               sx={{ mb: 2 }}
               onClose={() => setAlert(null)}
             >
@@ -189,7 +204,10 @@ function Login() {
             </Alert>
           )}
 
-          <Box component="form" onSubmit={showPassword ? handlePasswordSubmit : handleEmailSubmit}>
+          <Box
+            component="form"
+            onSubmit={showPassword ? handlePasswordSubmit : handleEmailSubmit}
+          >
             <TextField
               fullWidth
               label="Email Address"

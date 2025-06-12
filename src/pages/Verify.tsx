@@ -11,10 +11,10 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  validateVerificationToken, 
-  setUserPassword, 
-  deleteVerificationToken 
+import {
+  validateVerificationToken,
+  setUserPassword,
+  deleteVerificationToken,
 } from '../lib/userService';
 
 function Verify() {
@@ -40,7 +40,8 @@ function Verify() {
       if (!email || !token) {
         setAlert({
           type: 'error',
-          message: 'Invalid verification link. Please check your email and try again.'
+          message:
+            'Invalid verification link. Please check your email and try again.',
         });
         setValidating(false);
         return;
@@ -49,18 +50,20 @@ function Verify() {
       try {
         const isValid = await validateVerificationToken(email, token);
         setIsValidToken(isValid);
-        
+
         if (!isValid) {
           setAlert({
             type: 'error',
-            message: 'This verification link is invalid or has expired. Please request a new one.'
+            message:
+              'This verification link is invalid or has expired. Please request a new one.',
           });
         }
       } catch (error) {
         console.error('Error validating token:', error);
         setAlert({
           type: 'error',
-          message: 'An error occurred while validating your link. Please try again.'
+          message:
+            'An error occurred while validating your link. Please try again.',
         });
       } finally {
         setValidating(false);
@@ -72,11 +75,11 @@ function Verify() {
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!password.trim()) {
       setAlert({
         type: 'error',
-        message: 'Please enter a password.'
+        message: 'Please enter a password.',
       });
       return;
     }
@@ -84,7 +87,7 @@ function Verify() {
     if (password.length < 6) {
       setAlert({
         type: 'error',
-        message: 'Password must be at least 6 characters long.'
+        message: 'Password must be at least 6 characters long.',
       });
       return;
     }
@@ -92,7 +95,7 @@ function Verify() {
     if (password !== confirmPassword) {
       setAlert({
         type: 'error',
-        message: 'Passwords do not match.'
+        message: 'Passwords do not match.',
       });
       return;
     }
@@ -100,7 +103,7 @@ function Verify() {
     if (!email || !token) {
       setAlert({
         type: 'error',
-        message: 'Invalid verification data.'
+        message: 'Invalid verification data.',
       });
       return;
     }
@@ -111,20 +114,21 @@ function Verify() {
     try {
       // Set the user's password and mark as verified
       await setUserPassword(email, password);
-      
+
       // Delete the verification token so it can't be reused
       await deleteVerificationToken(email, token);
-      
+
       // Auto-login the user
       login(email);
-      
+
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (error) {
       console.error('Error setting password:', error);
       setAlert({
         type: 'error',
-        message: 'An error occurred while setting your password. Please try again.'
+        message:
+          'An error occurred while setting your password. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -197,8 +201,8 @@ function Verify() {
           </Box>
 
           {alert && (
-            <Alert 
-              severity={alert.type} 
+            <Alert
+              severity={alert.type}
               sx={{ mb: 2 }}
               onClose={() => setAlert(null)}
             >

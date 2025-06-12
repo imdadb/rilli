@@ -22,10 +22,10 @@ function FinancePage() {
           width: '100%',
         }}
       >
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          sx={{ 
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
             color: 'primary.main',
             mb: 2,
             fontWeight: 300,
@@ -33,18 +33,10 @@ function FinancePage() {
         >
           Finance Management
         </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary"
-          sx={{ mt: 2 }}
-        >
+        <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
           Finance page works! 💰
         </Typography>
-        <Typography 
-          variant="body2" 
-          color="text.secondary"
-          sx={{ mt: 2 }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
           This page requires the 'see_finance' permission to access.
         </Typography>
       </Paper>

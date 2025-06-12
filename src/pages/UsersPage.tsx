@@ -67,10 +67,10 @@ function UsersPage() {
     const saved = localStorage.getItem('usersActiveTab');
     return saved ? parseInt(saved, 10) : 0;
   });
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active');
-  
+
   const [roles, setRoles] = useState<Role[]>([]);
   const [grantableRoles, setGrantableRoles] = useState<string[]>([]);
   const [users, setUsers] = useState<{
@@ -82,7 +82,7 @@ function UsersPage() {
     guardian: [],
     student: [],
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -138,7 +138,8 @@ function UsersPage() {
 
       if (grantableError) throw grantableError;
 
-      const grantableRoleNames = grantableData?.map(g => g.grantable_role) || [];
+      const grantableRoleNames =
+        grantableData?.map((g) => g.grantable_role) || [];
 
       // Fetch users by type with their current roles
       const userTypes: UserType[] = ['staff', 'guardian', 'student'];
@@ -151,7 +152,8 @@ function UsersPage() {
       for (const userType of userTypes) {
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select(`
+          .select(
+            `
             id,
             email,
             name,
@@ -161,7 +163,8 @@ function UsersPage() {
             role_user (
               role_id
             )
-          `)
+          `,
+          )
           .eq('user_type', userType)
           .order('email');
 
@@ -171,7 +174,9 @@ function UsersPage() {
         const processedUsers = (userData || []).map((user: any) => {
           const userRoles = user.role_user?.map((ru: any) => ru.role_id) || [];
           const roleNames = userRoles
-            .map((roleId: string) => rolesData?.find(r => r.id === roleId)?.name)
+            .map(
+              (roleId: string) => rolesData?.find((r) => r.id === roleId)?.name,
+            )
             .filter(Boolean);
 
           return {
@@ -199,11 +204,12 @@ function UsersPage() {
   // Filter users based on search and status
   const filteredUsers = useMemo(() => {
     const currentUsers = users[tabs[activeTab].type];
-    
-    return currentUsers.filter(user => {
+
+    return currentUsers.filter((user) => {
       // Status filter
       if (statusFilter === 'active' && user.status !== 'active') return false;
-      if (statusFilter === 'suspended' && user.status !== 'suspended') return false;
+      if (statusFilter === 'suspended' && user.status !== 'suspended')
+        return false;
       // Hide terminated users by default unless "all" is selected
       if (statusFilter !== 'all' && user.status === 'terminated') return false;
 
@@ -225,17 +231,19 @@ function UsersPage() {
   const handleRoleToggle = (userId: string, roleName: string) => {
     if (!canManageRoles || tabs[activeTab].type !== 'staff') return;
 
-    setUsers(prev => ({
+    setUsers((prev) => ({
       ...prev,
-      staff: prev.staff.map(user => {
+      staff: prev.staff.map((user) => {
         if (user.id !== userId) return user;
 
         const currentRoles = user.roles || [];
         const newRoles = currentRoles.includes(roleName)
-          ? currentRoles.filter(r => r !== roleName)
+          ? currentRoles.filter((r) => r !== roleName)
           : [...currentRoles, roleName];
 
-        const isDirty = JSON.stringify(newRoles.sort()) !== JSON.stringify((user.originalRoles || []).sort());
+        const isDirty =
+          JSON.stringify(newRoles.sort()) !==
+          JSON.stringify((user.originalRoles || []).sort());
 
         return {
           ...user,
@@ -248,10 +256,10 @@ function UsersPage() {
 
   // Save role changes for a user
   const handleSaveRoles = async (userId: string) => {
-    const user = users.staff.find(u => u.id === userId);
+    const user = users.staff.find((u) => u.id === userId);
     if (!user || !user.isDirty) return;
 
-    setSaving(prev => new Set([...prev, userId]));
+    setSaving((prev) => new Set([...prev, userId]));
     setError(null);
 
     try {
@@ -259,51 +267,55 @@ function UsersPage() {
       const originalRoles = user.originalRoles || [];
 
       // Calculate roles to add and remove
-      const rolesToAdd = currentRoles.filter(r => !originalRoles.includes(r));
-      const rolesToRemove = originalRoles.filter(r => !currentRoles.includes(r));
+      const rolesToAdd = currentRoles.filter((r) => !originalRoles.includes(r));
+      const rolesToRemove = originalRoles.filter(
+        (r) => !currentRoles.includes(r),
+      );
 
       const operations: Promise<any>[] = [];
 
       // Add new roles
       for (const roleName of rolesToAdd) {
-        const role = roles.find(r => r.name === roleName);
+        const role = roles.find((r) => r.name === roleName);
         if (role) {
           operations.push(
             supabase.from('role_user').insert({
               user_id: userId,
               role_id: role.id,
-            })
+            }),
           );
         }
       }
 
       // Remove old roles
       for (const roleName of rolesToRemove) {
-        const role = roles.find(r => r.name === roleName);
+        const role = roles.find((r) => r.name === roleName);
         if (role) {
           operations.push(
             supabase
               .from('role_user')
               .delete()
               .eq('user_id', userId)
-              .eq('role_id', role.id)
+              .eq('role_id', role.id),
           );
         }
       }
 
       if (operations.length > 0) {
         const results = await Promise.all(operations);
-        
+
         // Check for errors
         const errors = results.filter((result) => result.error);
         if (errors.length > 0) {
-          throw new Error(`Failed to update roles: ${errors.map(e => e.error.message).join(', ')}`);
+          throw new Error(
+            `Failed to update roles: ${errors.map((e) => e.error.message).join(', ')}`,
+          );
         }
 
         // Update user state to reflect saved changes
-        setUsers(prev => ({
+        setUsers((prev) => ({
           ...prev,
-          staff: prev.staff.map(u => {
+          staff: prev.staff.map((u) => {
             if (u.id !== userId) return u;
             return {
               ...u,
@@ -328,7 +340,7 @@ function UsersPage() {
         severity: 'error',
       });
     } finally {
-      setSaving(prev => {
+      setSaving((prev) => {
         const newSet = new Set(prev);
         newSet.delete(userId);
         return newSet;
@@ -399,7 +411,7 @@ function UsersPage() {
         renderCell: (params) => {
           const user = params.row as User;
           const userRoles = user.roles || [];
-          
+
           if (!canManageRoles) {
             return (
               <Stack direction="row" spacing={0.5} flexWrap="wrap">
@@ -431,8 +443,12 @@ function UsersPage() {
                     <Chip
                       label={roleName.replace('_', ' ').toUpperCase()}
                       size="small"
-                      color={userRoles.includes(roleName) ? 'primary' : 'default'}
-                      variant={userRoles.includes(roleName) ? 'filled' : 'outlined'}
+                      color={
+                        userRoles.includes(roleName) ? 'primary' : 'default'
+                      }
+                      variant={
+                        userRoles.includes(roleName) ? 'filled' : 'outlined'
+                      }
                     />
                   }
                   sx={{ margin: 0 }}
@@ -452,7 +468,7 @@ function UsersPage() {
         getActions: (params) => {
           const user = params.row as User;
           const isSaving = saving.has(user.id);
-          
+
           if (!user.isDirty || !canManageRoles) return [];
 
           return [
@@ -502,7 +518,8 @@ function UsersPage() {
           Users Management
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Manage users across different categories. Staff roles can be modified based on your permissions.
+          Manage users across different categories. Staff roles can be modified
+          based on your permissions.
         </Typography>
 
         {error && (
@@ -529,7 +546,11 @@ function UsersPage() {
 
         {/* Search and Filter Controls */}
         <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            alignItems="center"
+          >
             <TextField
               label="Search"
               placeholder="Search by School ID, Name, or Email"
@@ -542,7 +563,9 @@ function UsersPage() {
                 }
               }}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                startAdornment: (
+                  <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                ),
               }}
               sx={{ flexGrow: 1, minWidth: 300 }}
             />
@@ -550,7 +573,9 @@ function UsersPage() {
               <InputLabel>Status</InputLabel>
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as StatusFilter)
+                }
                 label="Status"
               >
                 <MenuItem value="active">Active</MenuItem>

@@ -9,6 +9,6 @@ interface RoleGuardProps {
 
 export function RoleGuard({ perm, children }: RoleGuardProps) {
   const { can } = useAuth();
-  
+
   return can(perm) ? <>{children}</> : <Navigate to="/dashboard" replace />;
 }

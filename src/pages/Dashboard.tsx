@@ -25,10 +25,10 @@ function Dashboard() {
           width: '100%',
         }}
       >
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          sx={{ 
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
             color: 'primary.main',
             mb: 2,
             fontWeight: 300,
@@ -36,11 +36,7 @@ function Dashboard() {
         >
           Welcome to the Dashboard
         </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary"
-          sx={{ mt: 2, mb: 3 }}
-        >
+        <Typography variant="h6" color="text.secondary" sx={{ mt: 2, mb: 3 }}>
           Logged in as: {currentEmail}
         </Typography>
 
@@ -48,7 +44,15 @@ function Dashboard() {
           <Typography variant="h6" gutterBottom>
             Your Roles:
           </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center', mb: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              justifyContent: 'center',
+              mb: 2,
+            }}
+          >
             {roles.length > 0 ? (
               roles.map((role) => (
                 <Chip
@@ -71,7 +75,14 @@ function Dashboard() {
           <Typography variant="h6" gutterBottom>
             Your Permissions:
           </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              justifyContent: 'center',
+            }}
+          >
             {permissions.length > 0 ? (
               permissions.map((permission) => (
                 <Chip

@@ -74,7 +74,7 @@ function DebugPermissions() {
               'manage_users',
               'see_finance',
               'manage_finance',
-              'see_classes'
+              'see_classes',
             ].map((perm) => (
               <Typography key={perm} variant="body2" sx={{ mb: 1 }}>
                 can('{perm}'): {can(perm) ? '✅ Yes' : '❌ No'}
@@ -91,10 +91,7 @@ function DebugPermissions() {
               Back to Home
             </Button>
             {!isLoggedIn && (
-              <Button
-                variant="outlined"
-                onClick={() => navigate('/login')}
-              >
+              <Button variant="outlined" onClick={() => navigate('/login')}>
                 Go to Login
               </Button>
             )}
