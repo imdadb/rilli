@@ -18,8 +18,6 @@ DELETE FROM role_grant_matrix;
 -- 2. Ensure other core users exist with final UUIDs (skip super_admin)
 INSERT INTO users (id, email, password, user_type, status, email_verified, name, school_id)
 VALUES
-  ('685fa97c-9fc4-474d-ace6-c57a309e3a8d','tfssteam@gmail.com','', 'staff','active', true,'Test CEO','STAFF-0002'),
-  ('f76688ec-d633-4b56-af06-a5f7cb42179c','tfss.manage@gmail.com','', 'staff','active', true,'Test Campus Director','STAFF-0003')
 ON CONFLICT (id) DO UPDATE SET 
   email = EXCLUDED.email,
   name = EXCLUDED.name,
