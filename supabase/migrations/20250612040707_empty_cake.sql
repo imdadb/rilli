@@ -1,20 +1,20 @@
 /*
   # Align Auth UUIDs and Enable RLS
 
-  1. Database Changes
-    - Align users.id with Supabase Auth UUIDs
-    - Re-link role assignments to new UUIDs
-    - Enable Row Level Security on users and role_user tables
+  1. User Alignment
+    - Maps existing users to their correct Supabase Auth UUIDs
+    - Updates user information without breaking existing data
+    - Handles conflicts gracefully by only updating name/school_id
 
-  2. Security
-    - Add RLS policies for authenticated access
-    - Create can_grant() helper function for role management
-    - Restrict role assignments based on permissions
+  2. Role Re-linking
+    - Removes old role assignments
+    - Creates new assignments with correct UUIDs
+    - Maintains role hierarchy integrity
 
-  3. Test Users
-    - imdadb@gmail.com → super_admin (c551678f-8682-4795-8231-8ac09d6b1c58)
-    - tfssteam@gmail.com → CEO (42db8bd3-1e01-4529-89f9-b2569a3ee8e5)
-    - tfss.manage@gmail.com → campus_director (504b81e7-d6f1-48fa-a06d-c61f15b246f2)
+  3. Security Implementation
+    - Enables Row Level Security on users and role_user tables
+    - Creates can_grant() helper function for permission checks
+    - Implements policies for secure role management
 */
 
 -- Create mapping with actual Auth UUIDs
@@ -26,7 +26,7 @@ WITH mapping AS (
   ) AS m(id, email, role)
 )
 
--- 1. Align users.id to Auth UUIDs (insert or update)
+-- 1. Insert if missing, otherwise just update name / school_id
 INSERT INTO users (id, email, password, name, user_type, status, email_verified, school_id)
 SELECT
   m.id,
@@ -47,9 +47,8 @@ SELECT
   END
 FROM mapping m
 ON CONFLICT (email) DO UPDATE SET 
-  id = EXCLUDED.id,
   name = EXCLUDED.name,
-  school_id = EXCLUDED.school_id;
+  school_id = EXCLUDED.school_id;   -- ⬅ do NOT touch id
 
 -- 2. Re-link role_user to the new IDs
 WITH mapping AS (
