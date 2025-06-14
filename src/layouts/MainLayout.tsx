@@ -26,6 +26,7 @@ import {
   People as PeopleIcon,
   AccountBalance as FinanceIcon,
   School as ClassesIcon,
+  EventNote as AttendanceIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -81,16 +82,22 @@ function MainLayout({ children }: MainLayoutProps) {
       permission: 'see_users',
     },
     {
-      text: 'Finance',
-      icon: <FinanceIcon />,
-      path: '/finance',
-      permission: 'see_finance',
+      text: 'Attendance',
+      icon: <AttendanceIcon />,
+      path: '/attendance',
+      permission: 'see_attendance',
     },
     {
       text: 'Classes',
       icon: <ClassesIcon />,
       path: '/classes',
       permission: 'see_classes',
+    },
+    {
+      text: 'Finance',
+      icon: <FinanceIcon />,
+      path: '/finance',
+      permission: 'see_finance',
     },
   ];
 
