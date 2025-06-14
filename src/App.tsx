@@ -15,7 +15,6 @@ import DebugPermissions from './pages/DebugPermissions';
 import UsersPage from './pages/UsersPage';
 import FinancePage from './pages/FinancePage';
 import ClassesPage from './pages/ClassesPage';
-import AttendancePage from './pages/AttendancePage';
 
 const theme = createTheme({
   palette: {
@@ -90,16 +89,6 @@ function App() {
                       <ProtectedRoute>
                         <RoleGuard perm="see_classes">
                           <ClassesPage />
-                        </RoleGuard>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/attendance"
-                    element={
-                      <ProtectedRoute>
-                        <RoleGuard perm="see_attendance">
-                          <AttendancePage />
                         </RoleGuard>
                       </ProtectedRoute>
                     }
